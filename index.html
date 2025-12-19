@@ -682,8 +682,8 @@
     <div class="modal-overlay" id="nicknameModal" style="display: none;">
         <div class="modal">
             <h3>🎉 恭喜完成挑战！</h3>
-            <p style="text-align: center; margin-bottom: 20px;">请输入您的昵称登上排行榜：</p>
-            <input type="text" id="nicknameInput" placeholder="请输入昵称 (最多10个字符)" maxlength="10">
+            <p style="text-align: center; margin-bottom: 20px;">请输入您的真实姓名登上排行榜：</p>
+            <input type="text" id="nicknameInput" placeholder="请输入真实姓名 (最多10个字符)" maxlength="10">
             <div class="modal-buttons">
                 <button id="submitScoreBtn">提交成绩</button>
                 <button id="cancelScoreBtn" style="background-color: #95a5a6;">取消</button>
@@ -1566,7 +1566,7 @@
                 
                 let html = '<h3 style="text-align: center; color: #4a6fa5; margin-top: 20px;">🏆 排行榜</h3>';
                 html += '<table id="leaderboard">';
-                html += '<thead><tr><th>排名</th><th>昵称</th><th>用时</th><th>挑战时间</th></tr></thead>';
+                html += '<thead><tr><th>排名</th><th>姓名</th><th>用时</th><th>挑战时间</th></tr></thead>';
                 html += '<tbody>';
                 
                 let currentRank = 1;
@@ -1998,7 +1998,7 @@
             submitScoreBtn.addEventListener('click', async () => {
                 const nickname = nicknameInput.value.trim();
                 if (!nickname) {
-                    alert('请输入昵称！');
+                    alert('请输入您的真实姓名！');
                     return;
                 }
                 
