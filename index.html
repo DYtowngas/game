@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解锁文化密码挑战赛</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'SimHei', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #4a6fa5;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .game-container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .level-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        
+        .total-timer {
+            font-size: 1.2rem;
+            color: #4a6fa5;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .grid-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+        
+        .crossword-grid {
+            display: inline-block;
+            border: 3px solid #2c3e50;
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: #fff;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            border-collapse: collapse;
+        }
+        
+        td {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #bdc3c7;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+            font-size: 22px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        td:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .blank-cell {
+            background-color: #f5f5f5;
+            border-color: #e0e0e0;
+        }
+        
+        .input-cell {
+            cursor: pointer;
+        }
+        
+        .input-cell.selected {
+            background-color: #e8f4fd !important;
+            box-shadow: inset 0 0 0 2px #1e88e5;
+        }
+        
+        .input-cell.filled {
+            background-color: #f0f8ff;
+        }
+        
+        .preset-cell {
+            background-color: #e8f4fd;
+            color: #1e88e5;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+        
+        button {
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 150px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        button#nextLevelBtn {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            display: none;
+        }
+        
+        button#nextLevelBtn:hover:not(:disabled) {
+            background: linear-gradient(to right, #219653, #27ae60);
+        }
+        
+        button#resetBtn {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        button#resetBtn:hover:not(:disabled) {
+            background: linear-gradient(to right, #c0392b, #a93226);
+        }
+        
+        .candidate-words {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #bdc3c7;
+            min-height: 80px;
+            width: 100%;
+        }
+        
+        .candidate-word {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border: 2px solid #4a6fa5;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .candidate-word:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            background-color: #e8f4fd;
+        }
+        
+        .candidate-word.selected {
+            background-color: #1e88e5;
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .candidate-word.used {
+            background-color: #f5f5f5;
+            color: #bbb;
+            border-color: #ddd;
+            cursor: not-allowed;
+        }
+        
+        .candidate-word.used:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #f5f5f5;
+        }
+        
+        .game-status {
+            text-align: center;
+            font-weight: bold;
+            min-height: 40px;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .correct {
+            background-color: #d5f4e6;
+            color: #27ae60;
+            border: 2px solid #27ae60;
+        }
+        
+        .incorrect {
+            background-color: #fdeaea;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+        
+        .info {
+            background-color: #e8f4fd;
+            color: #4a6fa5;
+            border: 2px solid #4a6fa5;
+        }
+        
+        .completion-time {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #4a6fa5;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f4fd;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .instructions {
+            background: linear-gradient(to right, #e8f4fd, #f0f8ff);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+            border-left: 5px solid #4a6fa5;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .instructions-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .instructions-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            list-style-type: none;
+        }
+        
+        .instructions li {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+        
+        .instructions strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .instructions .instruction-item {
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid #4a6fa5;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            width: 100%;
+        }
+        
+        @media (max-width: 768px) {
+            td {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .candidate-word {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            td {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+            
+            .candidate-word {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+            
+            button {
+                padding: 12px 20px;
+                min-width: 130px;
+                font-size: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        .level-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .level-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #666;
+            transition: all 0.3s;
+            cursor: default;
+            user-select: none;
+        }
+        
+        .level-dot.active {
+            background-color: #4a6fa5;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .level-dot.completed {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .celebrate {
+            animation: celebrate 0.5s ease-in-out 3;
+        }
+        
+        #leaderboard {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #leaderboard th {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        #leaderboard td {
+            width: auto;
+            height: auto;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            font-size: 16px;
+        }
+        
+        #leaderboard tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        #leaderboard tr:hover {
+            background-color: #e8f4fd;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4a6fa5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .modal input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        
+        .modal input:focus {
+            outline: none;
+            border-color: #4a6fa5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .modal-buttons button {
+            min-width: 120px;
+        }
+        
+        #viewLeaderboardBtn {
+            background: linear-gradient(to right, #9b59b6, #8e44ad);
+            margin-top: 10px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        
+        #viewLeaderboardBtn:hover:not(:disabled) {
+            background: linear-gradient(to right, #8e44ad, #7d3c98);
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        #setupApiKeyBtn {
+            background: linear-gradient(to right, #f39c12, #e67e22);
+        }
+        
+        .leaderboard-section {
+            margin-top: 30px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .leaderboard-section h3 {
+            text-align: center;
+        }
+        
+        .leaderboard-section p {
+            text-align: center;
+        }
+        
+        #refreshLeaderboardBtn, #hideLeaderboardBtn, #retryLeaderboardBtn {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>解锁文化密码挑战赛</h1>
+        </header>
+        
+        <div class="level-indicator" id="levelIndicator">
+            <div class="level-dot" data-level="1">1</div>
+            <div class="level-dot" data-level="2">2</div>
+            <div class="level-dot" data-level="3">3</div>
+            <div class="level-dot" data-level="4">4</div>
+        </div>
+        
+        <div class="game-container">
+            <div class="level-info">
+                <div class="level-title" id="levelTitle">第一关</div>
+                <div class="total-timer" id="totalTimer">总用时: 00:00.000</div>
+            </div>
+            
+            <h3 class="grid-title" id="gridTitle">请从下方备选字中选择填入空格中</h3>
+            <div class="crossword-grid">
+                <table id="crosswordTable">
+                    <!-- 网格将通过JavaScript动态生成 -->
+                </table>
+            </div>
+            
+            <div class="candidate-words" id="candidateWords">
+                <!-- 备选字将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="game-status" id="gameStatus">请选择空格或备选字</div>
+            <div class="completion-time" id="completionTime"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="nextLevelBtn">
+                <span>下一关</span>
+            </button>
+            <button id="checkBtn">
+                <span>检查答案</span>
+            </button>
+            <button id="resetBtn">
+                <span>重置本关</span>
+            </button>
+        </div>
+        
+        <!-- 排行榜展示区域 - 移动到控制按钮下方 -->
+        <div class="leaderboard-section" id="leaderboardContainer">
+            <!-- 内容将通过JavaScript动态生成 -->
+        </div>
+        
+        <div class="instructions">
+            <h3>游戏说明</h3>
+            <div class="instructions-content">
+                <div>
+                    <ul>
+                        <li class="instruction-item">
+                            <strong>游戏目标</strong>
+                            测测你对企业文化核心价值观的熟悉度，在尽量短的时间内完成四关填字游戏，解锁文化密码。
+                        </li>
+                        <li class="instruction-item">
+                            <strong>游戏提示</strong>
+                            所有四字词均出自九大核心价值观和常见四字成语，是破解密码的关键线索。
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <ul>
+                        <li class="instruction-item">
+                            <strong>游戏规则</strong>
+                            将下方所有备选字填入正确空格处，完成密码破解挑战。
+                        </li>
+                        <li class="instruction-item">
+                            <strong>关卡规则</strong>
+                            必须完成当前关卡才能解锁下一关密码。
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <!-- 修改页脚文案 -->
+        <p>解锁文化密码挑战赛 © 2025 广州东永港华燃气有限公司</p>
+    </footer>
+
+    <!-- 昵称输入弹窗 -->
+    <div class="modal-overlay" id="nicknameModal" style="display: none;">
+        <div class="modal">
+            <h3>🎉 恭喜完成挑战！</h3>
+            <p style="text-align: center; margin-bottom: 20px;">请输入您的昵称登上排行榜：</p>
+            <input type="text" id="nicknameInput" placeholder="请输入昵称 (最多10个字符)" maxlength="10">
+            <div class="modal-buttons">
+                <button id="submitScoreBtn">提交成绩</button>
+                <button id="cancelScoreBtn" style="background-color: #95a5a6;">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================
+        // Airtable配置
+        // ============================
+        const AIRTABLE_CONFIG = {
+            // 🔴 已更新为你提供的API Key
+            API_KEY: 'pat3Vo18ylVkIoJVz.9c8275eb2ea52d04865b200b5d7fdff92973c7e163becfb9d2685d60dacadbc0',
+            BASE_ID: 'appRaFWCn8rs6fnRp',
+            TABLE_NAME: 'gamerank',
+            API_URL: 'https://api.airtable.com/v0'
+        };
+
+        // ============================
+        // 游戏关卡数据
+        // ============================
+        const gameLevels = [
+            {
+                level: 1,
+                title: "第一关",
+                gridSize: { rows: 6, cols: 6 },
+                
+                words: [
+                    {
+                        id: 1,
+                        name: "安全可靠",
+                        direction: 'across',
+                        startRow: 1,
+                        startCol: 1,
+                        answer: "安全可靠",
+                        cells: [
+                            { row: 1, col: 1, char: '安', isPreset: false },
+                            { row: 1, col: 2, char: '全', isPreset: false },
+                            { row: 1, col: 3, char: '可', isPreset: true },
+                            { row: 1, col: 4, char: '靠', isPreset: false }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "全力以赴",
+                        direction: 'down',
+                        startRow: 1,
+                        startCol: 2,
+                        answer: "全力以赴",
+                        cells: [
+                            { row: 1, col: 2, char: '全', isPreset: false },
+                            { row: 2, col: 2, char: '力', isPreset: true },
+                            { row: 3, col: 2, char: '以', isPreset: false },
+                            { row: 4, col: 2, char: '赴', isPreset: true }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: "以客为尊",
+                        direction: 'across',
+                        startRow: 3,
+                        startCol: 2,
+                        answer: "以客为尊",
+                        cells: [
+                            { row: 3, col: 2, char: '以', isPreset: false },
+                            { row: 3, col: 3, char: '客', isPreset: false },
+                            { row: 3, col: 4, char: '为', isPreset: true },
+                            { row: 3, col: 5, char: '尊', isPreset: false }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        name: "尊师重道",
+                        direction: 'down',
+                        startRow: 3,
+                        startCol: 5,
+                        answer: "尊师重道",
+                        cells: [
+                            { row: 3, col: 5, char: '尊', isPreset: false },
+                            { row: 4, col: 5, char: '师', isPreset: false },
+                            { row: 5, col: 5, char: '重', isPreset: true },
+                            { row: 6, col: 5, char: '道', isPreset: true }
+                        ]
+                    }
+                ],
+                
+                candidateWords: ['安', '全', '靠', '以', '客', '尊', '师']
+            },
+            {
+                level: 2,
+                title: "第二关",
+                gridSize: { rows: 6, cols: 6 },
+                
+                words: [
+                    {
+                        id: 1,
+                        name: "领导才能",
+                        direction: 'down',
+                        startRow: 1,
+                        startCol: 3,
+                        answer: "领导才能",
+                        cells: [
+                            { row: 1, col: 3, char: '领', isPreset: true },
+                            { row: 2, col: 3, char: '导', isPreset: false },
+                            { row: 3, col: 3, char: '才', isPreset: false },
+                            { row: 4, col: 3, char: '能', isPreset: true }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "多才多艺",
+                        direction: 'across',
+                        startRow: 3,
+                        startCol: 2,
+                        answer: "多才多艺",
+                        cells: [
+                            { row: 3, col: 2, char: '多', isPreset: false },
+                            { row: 3, col: 3, char: '才', isPreset: false },
+                            { row: 3, col: 4, char: '多', isPreset: true },
+                            { row: 3, col: 5, char: '艺', isPreset: true }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: "多元技能",
+                        direction: 'down',
+                        startRow: 3,
+                        startCol: 2,
+                        answer: "多元技能",
+                        cells: [
+                            { row: 3, col: 2, char: '多', isPreset: false },
+                            { row: 4, col: 2, char: '元', isPreset: false },
+                            { row: 5, col: 2, char: '技', isPreset: false },
+                            { row: 6, col: 2, char: '能', isPreset: false }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        name: "能工巧匠",
+                        direction: 'across',
+                        startRow: 6,
+                        startCol: 2,
+                        answer: "能工巧匠",
+                        cells: [
+                            { row: 6, col: 2, char: '能', isPreset: false },
+                            { row: 6, col: 3, char: '工', isPreset: false },
+                            { row: 6, col: 4, char: '巧', isPreset: true },
+                            { row: 6, col: 5, char: '匠', isPreset: true }
+                        ]
+                    }
+                ],
+                
+                candidateWords: ['导', '才', '多', '元', '技', '能', '工']
+            },
+            {
+                level: 3,
+                title: "第三关",
+                gridSize: { rows: 6, cols: 6 },
+                
+                words: [
+                    {
+                        id: 1,
+                        name: "团结共赢",
+                        direction: 'down',
+                        startRow: 2,
+                        startCol: 1,
+                        answer: "团结共赢",
+                        cells: [
+                            { row: 2, col: 1, char: '团', isPreset: false },
+                            { row: 3, col: 1, char: '结', isPreset: true },
+                            { row: 4, col: 1, char: '共', isPreset: true },
+                            { row: 5, col: 1, char: '赢', isPreset: false }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "结果导向",
+                        direction: 'across',
+                        startRow: 3,
+                        startCol: 1,
+                        answer: "结果导向",
+                        cells: [
+                            { row: 3, col: 1, char: '结', isPreset: true },
+                            { row: 3, col: 2, char: '果', isPreset: false },
+                            { row: 3, col: 3, char: '导', isPreset: false },
+                            { row: 3, col: 4, char: '向', isPreset: true }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: "正向沟通",
+                        direction: 'down',
+                        startRow: 2,
+                        startCol: 4,
+                        answer: "正向沟通",
+                        cells: [
+                            { row: 2, col: 4, char: '正', isPreset: false },
+                            { row: 3, col: 4, char: '向', isPreset: true },
+                            { row: 4, col: 4, char: '沟', isPreset: false },
+                            { row: 5, col: 4, char: '通', isPreset: false }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        name: "四通八达",
+                        direction: 'across',
+                        startRow: 5,
+                        startCol: 3,
+                        answer: "四通八达",
+                        cells: [
+                            { row: 5, col: 3, char: '四', isPreset: false },
+                            { row: 5, col: 4, char: '通', isPreset: false },
+                            { row: 5, col: 5, char: '八', isPreset: true },
+                            { row: 5, col: 6, char: '达', isPreset: true }
+                        ]
+                    }
+                ],
+                
+                candidateWords: ['团', '赢', '果', '导', '正', '沟', '通', '四']
+            },
+            {
+                level: 4,
+                title: "第四关",
+                gridSize: { rows: 7, cols: 7 },
+                
+                words: [
+                    {
+                        id: 1,
+                        name: "思维革新",
+                        direction: 'down',
+                        startRow: 3,
+                        startCol: 2,
+                        answer: "思维革新",
+                        cells: [
+                            { row: 3, col: 2, char: '思', isPreset: false },
+                            { row: 4, col: 2, char: '维', isPreset: true },
+                            { row: 5, col: 2, char: '革', isPreset: false },
+                            { row: 6, col: 2, char: '新', isPreset: false }
+                        ]
+                    },
+                    {
+                        id: 2,
+                        name: "日新月异",
+                        direction: 'across',
+                        startRow: 6,
+                        startCol: 1,
+                        answer: "日新月异",
+                        cells: [
+                            { row: 6, col: 1, char: '日', isPreset: true },
+                            { row: 6, col: 2, char: '新', isPreset: false },
+                            { row: 6, col: 3, char: '月', isPreset: false },
+                            { row: 6, col: 4, char: '异', isPreset: true }
+                        ]
+                    },
+                    {
+                        id: 3,
+                        name: "大同小异",
+                        direction: 'down',
+                        startRow: 3,
+                        startCol: 4,
+                        answer: "大同小异",
+                        cells: [
+                            { row: 3, col: 4, char: '大', isPreset: false },
+                            { row: 4, col: 4, char: '同', isPreset: false },
+                            { row: 5, col: 4, char: '小', isPreset: true },
+                            { row: 6, col: 4, char: '异', isPreset: true }
+                        ]
+                    },
+                    {
+                        id: 4,
+                        name: "一视同仁",
+                        direction: 'down',
+                        startRow: 2,
+                        startCol: 6,
+                        answer: "一视同仁",
+                        cells: [
+                            { row: 2, col: 6, char: '一', isPreset: false },
+                            { row: 3, col: 6, char: '视', isPreset: false },
+                            { row: 4, col: 6, char: '同', isPreset: true },
+                            { row: 5, col: 6, char: '仁', isPreset: true }
+                        ]
+                    },
+                    {
+                        id: 5,
+                        name: "大局视野",
+                        direction: 'across',
+                        startRow: 3,
+                        startCol: 4,
+                        answer: "大局视野",
+                        cells: [
+                            { row: 3, col: 4, char: '大', isPreset: false },
+                            { row: 3, col: 5, char: '局', isPreset: false },
+                            { row: 3, col: 6, char: '视', isPreset: false },
+                            { row: 3, col: 7, char: '野', isPreset: false }
+                        ]
+                    }
+                ],
+                
+                candidateWords: ['思', '革', '新', '月', '大', '局', '视', '野', '一', '同']
+            }
+        ];
+
+        // ============================
+        // 游戏状态（修复计时器显示问题）
+        // ============================
+        const gameState = {
+            currentLevel: 0,
+            levelsCompleted: 0,
+            gameStarted: false,
+            gameEnded: false,
+            startTime: null,
+            endTime: null,
+            timerInterval: null, // 改回使用setInterval
+            totalMilliseconds: 0,
+            
+            currentGrid: [],
+            userAnswers: {},
+            filledCells: 0,
+            totalCells: 0,
+            selectedCell: null,
+            selectedCandidate: null,
+            usedCandidates: new Set(),
+            candidateToCell: new Map(),
+            shuffledCandidates: [],
+            
+            init: function(levelIndex) {
+                this.currentLevel = levelIndex;
+                const levelData = gameLevels[levelIndex];
+                
+                this.currentGrid = this.initGrid(levelData);
+                
+                this.userAnswers = {};
+                this.filledCells = 0;
+                
+                this.totalCells = 0;
+                for (let r = 1; r <= levelData.gridSize.rows; r++) {
+                    for (let c = 1; c <= levelData.gridSize.cols; c++) {
+                        if (this.currentGrid[r][c].type === 'input' && !this.currentGrid[r][c].isPreset) {
+                            this.totalCells++;
+                        }
+                    }
+                }
+                
+                this.selectedCell = null;
+                this.selectedCandidate = null;
+                this.usedCandidates = new Set();
+                this.candidateToCell = new Map();
+                
+                this.shuffledCandidates = this.shuffleArray([...levelData.candidateWords]);
+                
+                if (levelIndex === 0 && !this.gameStarted) {
+                    this.gameStarted = true;
+                    this.startTime = Date.now();
+                    this.startTimer();
+                }
+            },
+            
+            shuffleArray: function(array) {
+                const newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            },
+            
+            initGrid: function(levelData) {
+                const { rows, cols } = levelData.gridSize;
+                const grid = [];
+                
+                for (let r = 1; r <= rows; r++) {
+                    grid[r] = [];
+                    for (let c = 1; c <= cols; c++) {
+                        grid[r][c] = {
+                            type: 'blank',
+                            correctAnswer: '',
+                            isPreset: false,
+                            wordIds: [],
+                            wordDirections: []
+                        };
+                    }
+                }
+                
+                levelData.words.forEach(word => {
+                    word.cells.forEach(cell => {
+                        const { row, col, char, isPreset } = cell;
+                        
+                        grid[row][col].type = 'input';
+                        grid[row][col].correctAnswer = char;
+                        if (isPreset) {
+                            grid[row][col].isPreset = true;
+                        }
+                        grid[row][col].wordIds.push(word.id);
+                        grid[row][col].wordDirections.push(word.direction);
+                    });
+                });
+                
+                return grid;
+            },
+            
+            // 修复：使用setInterval，每16ms更新一次（约60fps），确保显示平滑
+            startTimer: function() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                }
+                
+                this.startTime = Date.now();
+                this.totalMilliseconds = 0;
+                
+                // 立即更新一次显示
+                this.updateTimerDisplay();
+                
+                // 每16毫秒更新一次（约60fps），确保显示平滑
+                this.timerInterval = setInterval(() => {
+                    this.updateTimerDisplay();
+                }, 16); // 16ms ≈ 60fps
+            },
+            
+            // 修复：实时更新显示，不使用节流
+            updateTimerDisplay: function() {
+                if (!this.startTime) return;
+                
+                const now = Date.now();
+                this.totalMilliseconds = now - this.startTime;
+                
+                // 实时更新显示，不节流
+                const totalSeconds = this.totalMilliseconds / 1000;
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = Math.floor(totalSeconds % 60);
+                const ms = Math.floor(this.totalMilliseconds % 1000);
+                
+                const timerElement = document.getElementById('totalTimer');
+                if (timerElement) {
+                    timerElement.textContent = `总用时: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+                }
+            },
+            
+            // 格式化时间（显示3位毫秒）
+            formatTime: function(milliseconds) {
+                const totalSeconds = milliseconds / 1000;
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = Math.floor(totalSeconds % 60);
+                const ms = Math.floor(milliseconds % 1000);
+                
+                return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+            },
+            
+            // 将毫秒转换为秒（小数）
+            millisecondsToSeconds: function(milliseconds) {
+                return milliseconds / 1000;
+            },
+            
+            stopTimer: function() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+                
+                // 确保最终时间显示准确
+                this.updateTimerDisplay();
+            },
+            
+            endGame: function() {
+                this.gameEnded = true;
+                this.endTime = Date.now();
+                this.stopTimer();
+            },
+            
+            selectCell: function(row, col) {
+                const cellData = this.currentGrid[row][col];
+                
+                if (cellData.type !== 'input' || cellData.isPreset) {
+                    this.selectedCell = null;
+                    return false;
+                }
+                
+                if (this.selectedCell && this.selectedCell.row === row && this.selectedCell.col === col) {
+                    this.selectedCell = null;
+                    return false;
+                }
+                
+                if (this.selectedCell) {
+                    const key1 = `${this.selectedCell.row}-${this.selectedCell.col}`;
+                    const key2 = `${row}-${col}`;
+                    const char1 = this.userAnswers[key1];
+                    const char2 = this.userAnswers[key2];
+                    
+                    if (char1 && char2) {
+                        const success = this.swapCells(this.selectedCell.row, this.selectedCell.col, row, col);
+                        this.selectedCell = null;
+                        return success;
+                    }
+                    else if (char1 && !char2) {
+                        const success = this.moveCell(this.selectedCell.row, this.selectedCell.col, row, col);
+                        this.selectedCell = null;
+                        return success;
+                    }
+                    else if (!char1 && char2) {
+                        const success = this.moveCell(row, col, this.selectedCell.row, this.selectedCell.col);
+                        this.selectedCell = null;
+                        return success;
+                    }
+                    else {
+                        this.selectedCell = { row, col };
+                        return true;
+                    }
+                }
+                
+                this.selectedCell = { row, col };
+                return true;
+            },
+            
+            selectCandidate: function(char) {
+                if (this.selectedCandidate === char) {
+                    this.selectedCandidate = null;
+                    return false;
+                }
+                
+                this.selectedCandidate = char;
+                return true;
+            },
+            
+            fillSelectedCell: function(char) {
+                if (!this.selectedCell) {
+                    return false;
+                }
+                
+                const { row, col } = this.selectedCell;
+                return this.fillCell(row, col, char);
+            },
+            
+            fillCell: function(row, col, char) {
+                const key = `${row}-${col}`;
+                const cellData = this.currentGrid[row][col];
+                
+                if (cellData.type !== 'input' || cellData.isPreset) {
+                    return false;
+                }
+                
+                if (this.usedCandidates.has(char) && char !== this.userAnswers[key]) {
+                    return false;
+                }
+                
+                const existingChar = this.userAnswers[key];
+                if (existingChar) {
+                    this.removeCell(row, col);
+                }
+                
+                this.userAnswers[key] = char;
+                this.filledCells++;
+                
+                this.usedCandidates.add(char);
+                
+                this.candidateToCell.set(char, { row, col });
+                
+                return true;
+            },
+            
+            removeCell: function(row, col) {
+                const key = `${row}-${col}`;
+                const cellData = this.currentGrid[row][col];
+                
+                if (cellData.type !== 'input' || cellData.isPreset) {
+                    return false;
+                }
+                
+                const char = this.userAnswers[key];
+                if (!char) return false;
+                
+                delete this.userAnswers[key];
+                this.filledCells--;
+                
+                this.usedCandidates.delete(char);
+                
+                this.candidateToCell.delete(char);
+                
+                return true;
+            },
+            
+            clearSelectedCell: function(char) {
+                if (!this.selectedCell) {
+                    return false;
+                }
+                
+                const { row, col } = this.selectedCell;
+                const key = `${row}-${col}`;
+                const cellData = this.currentGrid[row][col];
+                
+                if (cellData.type !== 'input' || cellData.isPreset) {
+                    return false;
+                }
+                
+                const cellChar = this.userAnswers[key];
+                if (!cellChar) return false;
+                
+                if (cellChar !== char) {
+                    return false;
+                }
+                
+                this.removeCell(row, col);
+                return true;
+            },
+            
+            swapCells: function(row1, col1, row2, col2) {
+                const key1 = `${row1}-${col1}`;
+                const key2 = `${row2}-${col2}`;
+                const char1 = this.userAnswers[key1];
+                const char2 = this.userAnswers[key2];
+                
+                if (!char1 || !char2) {
+                    return false;
+                }
+                
+                if (char1 === char2) {
+                    return true;
+                }
+                
+                this.userAnswers[key1] = char2;
+                this.userAnswers[key2] = char1;
+                
+                this.candidateToCell.set(char1, { row: row2, col: col2 });
+                this.candidateToCell.set(char2, { row: row1, col: col1 });
+                
+                return true;
+            },
+            
+            moveCell: function(fromRow, fromCol, toRow, toCol) {
+                const fromKey = `${fromRow}-${fromCol}`;
+                const toKey = `${toRow}-${toCol}`;
+                const char = this.userAnswers[fromKey];
+                
+                if (!char || this.userAnswers[toKey]) {
+                    return false;
+                }
+                
+                this.userAnswers[toKey] = char;
+                delete this.userAnswers[fromKey];
+                
+                this.candidateToCell.set(char, { row: toRow, col: toCol });
+                
+                return true;
+            },
+            
+            checkLevelAnswers: function() {
+                let allCorrect = true;
+                let incorrectCells = [];
+                
+                if (this.filledCells < this.totalCells) {
+                    return { 
+                        allFilled: false, 
+                        allCorrect: false, 
+                        message: "密码尚未完全破解，还有空格未填哦~",
+                        incorrectCells: []
+                    };
+                }
+                
+                for (let r = 1; r <= gameLevels[this.currentLevel].gridSize.rows; r++) {
+                    for (let c = 1; c <= gameLevels[this.currentLevel].gridSize.cols; c++) {
+                        const cellData = this.currentGrid[r][c];
+                        if (cellData.type === 'input' && !cellData.isPreset) {
+                            const key = `${r}-${c}`;
+                            const userAnswer = this.userAnswers[key] || '';
+                            const correctAnswer = cellData.correctAnswer;
+                            
+                            if (userAnswer !== correctAnswer) {
+                                allCorrect = false;
+                                incorrectCells.push({ row: r, col: c });
+                            }
+                        }
+                    }
+                }
+                
+                if (!allCorrect) {
+                    return { 
+                        allFilled: true, 
+                        allCorrect: false, 
+                        message: "密码破解有误，再检查一下吧~",
+                        incorrectCells: incorrectCells
+                    };
+                }
+                
+                return { 
+                    allFilled: true, 
+                    allCorrect: true, 
+                    message: "恭喜！密码正确！可以解锁下一关！",
+                    incorrectCells: []
+                };
+            },
+            
+            nextLevel: function() {
+                this.levelsCompleted++;
+                
+                if (this.currentLevel < gameLevels.length - 1) {
+                    return true;
+                } else {
+                    this.endGame();
+                    return false;
+                }
+            }
+        };
+
+        // ============================
+        // Airtable API 函数
+        // ============================
+        const AirtableAPI = {
+            // 提交成绩到Airtable
+            async submitScore(name, timeInMilliseconds) {
+                try {
+                    const timeInSeconds = timeInMilliseconds / 1000;
+                    const timeText = gameState.formatTime(timeInMilliseconds);
+                    
+                    const url = `${AIRTABLE_CONFIG.API_URL}/${AIRTABLE_CONFIG.BASE_ID}/${encodeURIComponent(AIRTABLE_CONFIG.TABLE_NAME)}`;
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${AIRTABLE_CONFIG.API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            records: [
+                                {
+                                    fields: {
+                                        'Name': name,
+                                        'Time': timeInSeconds,
+                                        'Timetext': timeText,
+                                        'Date': new Date().toISOString()
+                                    }
+                                }
+                            ]
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`提交失败: ${response.status} - ${errorText}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('成绩提交成功:', data);
+                    return { success: true, data };
+                } catch (error) {
+                    console.error('提交成绩失败:', error);
+                    return { success: false, error: error.message };
+                }
+            },
+            
+            // 获取排行榜数据
+            async getLeaderboard() {
+                try {
+                    const url = `${AIRTABLE_CONFIG.API_URL}/${AIRTABLE_CONFIG.BASE_ID}/${encodeURIComponent(AIRTABLE_CONFIG.TABLE_NAME)}?sort[0][field]=Time&sort[0][direction]=asc&maxRecords=100`;
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${AIRTABLE_CONFIG.API_KEY}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`获取失败: ${response.status} - ${errorText}`);
+                    }
+                    
+                    const data = await response.json();
+                    const records = data.records;
+                    
+                    if (!records || records.length === 0) {
+                        return { success: true, data: [] };
+                    }
+                    
+                    const playerBestScores = {};
+                    
+                    records.forEach(record => {
+                        const fields = record.fields;
+                        const name = fields.Name;
+                        let time = fields.Time;
+                        
+                        let timeInMilliseconds;
+                        if (time === Math.floor(time)) {
+                            timeInMilliseconds = time * 1000;
+                        } else {
+                            timeInMilliseconds = time * 1000;
+                        }
+                        
+                        if (name && time !== null && time !== undefined) {
+                            if (!playerBestScores[name] || timeInMilliseconds < playerBestScores[name].timeInMilliseconds) {
+                                playerBestScores[name] = {
+                                    Name: name,
+                                    Time: time,
+                                    timeInMilliseconds: timeInMilliseconds,
+                                    Timetext: fields.Timetext || gameState.formatTime(timeInMilliseconds),
+                                    Date: fields.Date
+                                };
+                            }
+                        }
+                    });
+                    
+                    const bestScoresArray = Object.values(playerBestScores);
+                    
+                    bestScoresArray.sort((a, b) => {
+                        if (a.timeInMilliseconds !== b.timeInMilliseconds) {
+                            return a.timeInMilliseconds - b.timeInMilliseconds;
+                        }
+                        return new Date(a.Date) - new Date(b.Date);
+                    });
+                    
+                    return { 
+                        success: true, 
+                        data: bestScoresArray.slice(0, 20).map((item, index) => ({
+                            id: `best_${index}`,
+                            fields: item
+                        }))
+                    };
+                } catch (error) {
+                    console.error('获取排行榜失败:', error);
+                    return { success: false, error: error.message };
+                }
+            },
+            
+            // 显示排行榜
+            async displayLeaderboard() {
+                const container = document.getElementById('leaderboardContainer');
+                
+                container.innerHTML = '<div class="loader"></div><p style="text-align: center;">正在加载排行榜...</p>';
+                
+                const result = await this.getLeaderboard();
+                
+                if (!result.success) {
+                    let errorMessage = result.error;
+                    
+                    if (result.error.includes('403')) {
+                        errorMessage = '访问权限被拒绝。请检查API Key是否正确。';
+                    } else if (result.error.includes('404')) {
+                        errorMessage = '未找到表。请检查表名是否正确：gamerank';
+                    } else if (result.error.includes('401')) {
+                        errorMessage = '认证失败。API Key可能无效或已过期。';
+                    }
+                    
+                    container.innerHTML = `
+                        <h3 style="text-align: center; color: #4a6fa5; margin-top: 20px;">🏆 排行榜</h3>
+                        <p style="text-align: center; color: #e74c3c;">加载失败: ${errorMessage}</p>
+                        <p style="text-align: center; font-size: 0.9rem; color: #666;">请确保Airtable表中有正确的字段：Name, Time, Timetext, Date</p>
+                        <div class="button-container">
+                            <button id="retryLeaderboardBtn">重试</button>
+                            <button id="hideLeaderboardBtn">隐藏排行榜</button>
+                        </div>
+                    `;
+                    
+                    document.getElementById('retryLeaderboardBtn').addEventListener('click', () => {
+                        this.displayLeaderboard();
+                    });
+                    
+                    document.getElementById('hideLeaderboardBtn').addEventListener('click', () => {
+                        showLeaderboardButton();
+                    });
+                    
+                    return;
+                }
+                
+                const records = result.data;
+                
+                if (!records || records.length === 0) {
+                    container.innerHTML = `
+                        <h3 style="text-align: center; color: #4a6fa5; margin-top: 20px;">🏆 排行榜</h3>
+                        <p style="text-align: center;">暂无成绩，快来成为第一名吧！</p>
+                        <div class="button-container">
+                            <button id="hideLeaderboardBtn">隐藏排行榜</button>
+                        </div>
+                    `;
+                    
+                    document.getElementById('hideLeaderboardBtn').addEventListener('click', () => {
+                        showLeaderboardButton();
+                    });
+                    
+                    return;
+                }
+                
+                let html = '<h3 style="text-align: center; color: #4a6fa5; margin-top: 20px;">🏆 排行榜</h3>';
+                html += '<table id="leaderboard">';
+                html += '<thead><tr><th>排名</th><th>昵称</th><th>用时</th><th>挑战时间</th></tr></thead>';
+                html += '<tbody>';
+                
+                let currentRank = 1;
+                let previousTime = null;
+                let previousRank = 0;
+                
+                records.forEach((record, index) => {
+                    const fields = record.fields;
+                    
+                    let timeStr;
+                    if (fields.Timetext) {
+                        timeStr = fields.Timetext;
+                    } else if (fields.timeInMilliseconds) {
+                        timeStr = gameState.formatTime(fields.timeInMilliseconds);
+                    } else if (fields.Time) {
+                        timeStr = gameState.formatTime(fields.Time * 1000);
+                    } else {
+                        timeStr = '--:--.--';
+                    }
+                    
+                    const date = new Date(fields.Date);
+                    const dateStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                    
+                    let displayRank = currentRank;
+                    if (previousTime !== null && fields.timeInMilliseconds === previousTime) {
+                        displayRank = previousRank;
+                    } else {
+                        previousRank = currentRank;
+                        displayRank = currentRank;
+                    }
+                    
+                    previousTime = fields.timeInMilliseconds;
+                    currentRank++;
+                    
+                    let rowClass = '';
+                    if (displayRank === 1) rowClass = 'style="background-color: #fffacd;"';
+                    else if (displayRank === 2) rowClass = 'style="background-color: #f0f0f0;"';
+                    else if (displayRank === 3) rowClass = 'style="background-color: #ffebcd;"';
+                    
+                    html += `<tr ${rowClass}>`;
+                    html += `<td>${displayRank}</td>`;
+                    html += `<td>${fields.Name}</td>`;
+                    html += `<td>${timeStr}</td>`;
+                    html += `<td>${dateStr}</td>`;
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table>';
+                
+                html += `
+                    <div class="button-container">
+                        <button id="refreshLeaderboardBtn">刷新排行榜</button>
+                        <button id="hideLeaderboardBtn">隐藏排行榜</button>
+                    </div>
+                `;
+                
+                container.innerHTML = html;
+                
+                document.getElementById('refreshLeaderboardBtn').addEventListener('click', () => {
+                    this.displayLeaderboard();
+                });
+                
+                document.getElementById('hideLeaderboardBtn').addEventListener('click', () => {
+                    showLeaderboardButton();
+                });
+            }
+        };
+
+        // ============================
+        // DOM元素和初始化
+        // ============================
+        let crosswordTable, gameStatus, totalTimer, completionTime;
+        let candidateWords, levelTitle, gridTitle;
+        let nextLevelBtn, checkBtn, resetBtn;
+        let levelIndicator;
+        let nicknameModal, nicknameInput, submitScoreBtn, cancelScoreBtn;
+        let viewLeaderboardBtn;
+
+        // 初始化游戏
+        document.addEventListener('DOMContentLoaded', function() {
+            crosswordTable = document.getElementById('crosswordTable');
+            gameStatus = document.getElementById('gameStatus');
+            totalTimer = document.getElementById('totalTimer');
+            completionTime = document.getElementById('completionTime');
+            candidateWords = document.getElementById('candidateWords');
+            levelTitle = document.getElementById('levelTitle');
+            gridTitle = document.getElementById('gridTitle');
+            levelIndicator = document.getElementById('levelIndicator');
+            
+            nextLevelBtn = document.getElementById('nextLevelBtn');
+            checkBtn = document.getElementById('checkBtn');
+            resetBtn = document.getElementById('resetBtn');
+            
+            nicknameModal = document.getElementById('nicknameModal');
+            nicknameInput = document.getElementById('nicknameInput');
+            submitScoreBtn = document.getElementById('submitScoreBtn');
+            cancelScoreBtn = document.getElementById('cancelScoreBtn');
+            
+            initializeGame();
+            setupEventListeners();
+            updateLevelIndicator();
+            
+            showLeaderboardButton();
+        });
+
+        // 显示排行榜按钮
+        function showLeaderboardButton() {
+            const container = document.getElementById('leaderboardContainer');
+            container.innerHTML = `
+                <button id="viewLeaderboardBtn">查看排行榜</button>
+            `;
+            
+            document.getElementById('viewLeaderboardBtn').addEventListener('click', () => {
+                AirtableAPI.displayLeaderboard();
+            });
+        }
+
+        // 初始化游戏
+        function initializeGame() {
+            gameState.currentLevel = 0;
+            gameState.levelsCompleted = 0;
+            gameState.gameStarted = false;
+            gameState.gameEnded = false;
+            gameState.startTime = null;
+            gameState.endTime = null;
+            gameState.totalMilliseconds = 0;
+            
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+            
+            gameState.init(0);
+            createGrid();
+            createCandidateWords();
+            
+            levelTitle.textContent = gameLevels[0].title;
+            gridTitle.textContent = "请从下方备选字中选择填入空格中";
+            
+            nextLevelBtn.style.display = 'none';
+            checkBtn.style.display = 'flex';
+            
+            resetBtn.textContent = '重置本关';
+            
+            totalTimer.style.display = 'block';
+            totalTimer.textContent = '总用时: 00:00.000';
+            
+            completionTime.style.display = 'none';
+            
+            gameStatus.textContent = '请选择空格或备选字';
+            gameStatus.className = 'game-status info';
+            
+            gameStatus.classList.remove('celebrate');
+            
+            updateLevelIndicator();
+            
+            showLeaderboardButton();
+        }
+
+        // 创建网格
+        function createGrid() {
+            const levelData = gameLevels[gameState.currentLevel];
+            const { rows, cols } = levelData.gridSize;
+            
+            crosswordTable.innerHTML = '';
+            
+            for (let r = 1; r <= rows; r++) {
+                const rowEl = document.createElement('tr');
+                
+                for (let c = 1; c <= cols; c++) {
+                    const cellData = gameState.currentGrid[r][c];
+                    const cellEl = document.createElement('td');
+                    
+                    if (cellData.type === 'blank') {
+                        cellEl.className = 'blank-cell';
+                    } 
+                    else if (cellData.type === 'input') {
+                        if (cellData.isPreset) {
+                            cellEl.className = 'preset-cell';
+                            cellEl.textContent = cellData.correctAnswer;
+                        } 
+                        else {
+                            cellEl.className = 'input-cell';
+                            cellEl.dataset.row = r;
+                            cellEl.dataset.col = c;
+                            
+                            const key = `${r}-${c}`;
+                            if (gameState.userAnswers[key]) {
+                                cellEl.textContent = gameState.userAnswers[key];
+                                cellEl.classList.add('filled');
+                            }
+                        }
+                    }
+                    
+                    rowEl.appendChild(cellEl);
+                }
+                
+                crosswordTable.appendChild(rowEl);
+            }
+            
+            setupCellListeners();
+        }
+
+        // 创建备选字
+        function createCandidateWords() {
+            candidateWords.innerHTML = '';
+            
+            gameState.shuffledCandidates.forEach(char => {
+                const wordEl = document.createElement('div');
+                wordEl.className = 'candidate-word';
+                wordEl.textContent = char;
+                wordEl.dataset.char = char;
+                
+                if (gameState.usedCandidates.has(char)) {
+                    wordEl.classList.add('used');
+                }
+                
+                if (gameState.selectedCandidate === char) {
+                    wordEl.classList.add('selected');
+                }
+                
+                candidateWords.appendChild(wordEl);
+            });
+            
+            setupCandidateListeners();
+        }
+
+        // 更新UI选择状态
+        function updateSelectionUI() {
+            const allCells = crosswordTable.querySelectorAll('.input-cell:not(.preset-cell)');
+            allCells.forEach(cell => {
+                cell.classList.remove('selected');
+                
+                if (gameState.selectedCell) {
+                    const row = parseInt(cell.dataset.row);
+                    const col = parseInt(cell.dataset.col);
+                    if (gameState.selectedCell.row === row && gameState.selectedCell.col === col) {
+                        cell.classList.add('selected');
+                    }
+                }
+            });
+            
+            const allCandidates = candidateWords.querySelectorAll('.candidate-word');
+            allCandidates.forEach(candidate => {
+                candidate.classList.remove('selected');
+                
+                if (gameState.selectedCandidate === candidate.dataset.char) {
+                    candidate.classList.add('selected');
+                }
+            });
+            
+            let statusText = '';
+            
+            if (gameState.selectedCell && gameState.selectedCandidate) {
+                const { row, col } = gameState.selectedCell;
+                const existingChar = gameState.userAnswers[`${row}-${col}`];
+                if (existingChar) {
+                    statusText = `已选中格子(${row},${col})，当前有字"${existingChar}"，备选字"${gameState.selectedCandidate}"已选中`;
+                } else {
+                    statusText = `已选中格子(${row},${col})，备选字"${gameState.selectedCandidate}"已选中，点击确认填入`;
+                }
+            } else if (gameState.selectedCell) {
+                const { row, col } = gameState.selectedCell;
+                const existingChar = gameState.userAnswers[`${row}-${col}`];
+                if (existingChar) {
+                    statusText = `已选中格子(${row},${col})，当前有字"${existingChar}"，可点击空空格移动，或点击其他已填格子交换`;
+                } else {
+                    statusText = `已选中格子(${row},${col})，请点击备选字填入，或点击已填格子交换/移动`;
+                }
+            } else if (gameState.selectedCandidate) {
+                statusText = `已选中备选字"${gameState.selectedCandidate}"，请点击空格填入`;
+            } else {
+                statusText = '请选择空格或备选字';
+            }
+            
+            gameStatus.textContent = statusText;
+            gameStatus.className = 'game-status info';
+        }
+
+        // 设置单元格点击事件
+        function setupCellListeners() {
+            const cells = crosswordTable.querySelectorAll('.input-cell:not(.preset-cell)');
+            
+            cells.forEach(cell => {
+                cell.addEventListener('click', function() {
+                    const row = parseInt(this.dataset.row);
+                    const col = parseInt(this.dataset.col);
+                    
+                    if (gameState.selectedCandidate) {
+                        const filled = gameState.fillCell(row, col, gameState.selectedCandidate);
+                        
+                        if (filled) {
+                            this.textContent = gameState.selectedCandidate;
+                            this.classList.add('filled');
+                            
+                            createCandidateWords();
+                            
+                            gameState.selectedCandidate = null;
+                            gameState.selectedCell = null;
+                            
+                            gameStatus.textContent = `已将"${gameState.userAnswers[`${row}-${col}`]}"填入格子(${row},${col})`;
+                            gameStatus.className = 'game-status info';
+                        } else {
+                            gameStatus.textContent = '填入失败，该备选字可能已被使用';
+                            gameStatus.className = 'game-status incorrect';
+                        }
+                    } else {
+                        const selected = gameState.selectCell(row, col);
+                        
+                        if (selected && gameState.selectedCell === null) {
+                            updateAllGridCells();
+                            createCandidateWords();
+                        }
+                    }
+                    
+                    updateSelectionUI();
+                });
+            });
+        }
+
+        // 更新所有网格单元格的显示
+        function updateAllGridCells() {
+            const levelData = gameLevels[gameState.currentLevel];
+            const { rows, cols } = levelData.gridSize;
+            
+            for (let r = 1; r <= rows; r++) {
+                for (let c = 1; c <= cols; c++) {
+                    const cellData = gameState.currentGrid[r][c];
+                    if (cellData.type === 'input' && !cellData.isPreset) {
+                        const cellElement = crosswordTable.querySelector(`td[data-row="${r}"][data-col="${c}"]`);
+                        if (cellElement) {
+                            const key = `${r}-${c}`;
+                            const char = gameState.userAnswers[key];
+                            
+                            if (char) {
+                                cellElement.textContent = char;
+                                cellElement.classList.add('filled');
+                            } else {
+                                cellElement.textContent = '';
+                                cellElement.classList.remove('filled');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 设置备选字点击事件
+        function setupCandidateListeners() {
+            const candidateElements = candidateWords.querySelectorAll('.candidate-word');
+            
+            candidateElements.forEach(element => {
+                element.addEventListener('click', function() {
+                    const char = this.dataset.char;
+                    
+                    if (this.classList.contains('used')) {
+                        if (!gameState.selectedCell || 
+                            (gameState.selectedCell && 
+                             gameState.userAnswers[`${gameState.selectedCell.row}-${gameState.selectedCell.col}`] !== char)) {
+                            
+                            gameStatus.textContent = `"${char}"已被使用，不可重复选择`;
+                            gameStatus.className = 'game-status incorrect';
+                            return;
+                        }
+                    }
+                    
+                    if (gameState.selectedCell) {
+                        const { row, col } = gameState.selectedCell;
+                        const existingChar = gameState.userAnswers[`${row}-${col}`];
+                        
+                        if (existingChar && existingChar === char) {
+                            const cleared = gameState.clearSelectedCell(char);
+                            
+                            if (cleared) {
+                                const cellElement = crosswordTable.querySelector(`td[data-row="${row}"][data-col="${col}"]`);
+                                if (cellElement) {
+                                    cellElement.textContent = '';
+                                    cellElement.classList.remove('filled');
+                                }
+                                
+                                createCandidateWords();
+                                
+                                gameState.selectedCell = null;
+                                gameState.selectedCandidate = null;
+                                
+                                gameStatus.textContent = `已清空格子(${row},${col})`;
+                                gameStatus.className = 'game-status info';
+                            }
+                        } else {
+                            const filled = gameState.fillSelectedCell(char);
+                            
+                            if (filled) {
+                                const { row, col } = gameState.selectedCell;
+                                const cellElement = crosswordTable.querySelector(`td[data-row="${row}"][data-col="${col}"]`);
+                                if (cellElement) {
+                                    cellElement.textContent = char;
+                                    cellElement.classList.add('filled');
+                                }
+                                
+                                createCandidateWords();
+                                
+                                gameState.selectedCell = null;
+                                gameState.selectedCandidate = null;
+                                
+                                gameStatus.textContent = `已将"${char}"填入格子(${row},${col})`;
+                                gameStatus.className = 'game-status info';
+                            } else {
+                                gameStatus.textContent = '填入失败，请重试';
+                                gameStatus.className = 'game-status incorrect';
+                            }
+                        }
+                    } else {
+                        const selected = gameState.selectCandidate(char);
+                    }
+                    
+                    updateSelectionUI();
+                });
+            });
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            checkBtn.addEventListener('click', checkAnswers);
+            
+            nextLevelBtn.addEventListener('click', goToNextLevel);
+            
+            resetBtn.addEventListener('click', resetGame);
+            
+            submitScoreBtn.addEventListener('click', async () => {
+                const nickname = nicknameInput.value.trim();
+                if (!nickname) {
+                    alert('请输入昵称！');
+                    return;
+                }
+                
+                submitScoreBtn.disabled = true;
+                submitScoreBtn.textContent = '提交中...';
+                
+                const result = await AirtableAPI.submitScore(nickname, gameState.totalMilliseconds);
+                
+                if (result.success) {
+                    nicknameModal.style.display = 'none';
+                    alert('成绩已成功提交到排行榜！');
+                    
+                    submitScoreBtn.disabled = false;
+                    submitScoreBtn.textContent = '提交成绩';
+                    
+                    AirtableAPI.displayLeaderboard();
+                } else {
+                    alert('提交失败: ' + result.error);
+                    submitScoreBtn.disabled = false;
+                    submitScoreBtn.textContent = '提交成绩';
+                }
+            });
+            
+            cancelScoreBtn.addEventListener('click', () => {
+                nicknameModal.style.display = 'none';
+                
+                submitScoreBtn.disabled = false;
+                submitScoreBtn.textContent = '提交成绩';
+            });
+        }
+
+        // 检查答案
+        function checkAnswers() {
+            const result = gameState.checkLevelAnswers();
+            
+            if (!result.allFilled) {
+                gameStatus.textContent = result.message;
+                gameStatus.className = 'game-status incorrect';
+            } else if (!result.allCorrect) {
+                gameStatus.textContent = result.message;
+                gameStatus.className = 'game-status incorrect';
+                
+                result.incorrectCells.forEach(cell => {
+                    const { row, col } = cell;
+                    const cellElement = crosswordTable.querySelector(`td[data-row="${row}"][data-col="${col}"]`);
+                    if (cellElement) {
+                        cellElement.style.boxShadow = 'inset 0 0 0 2px #e74c3c';
+                        
+                        setTimeout(() => {
+                            cellElement.style.boxShadow = '';
+                        }, 2000);
+                    }
+                });
+            } else {
+                gameStatus.textContent = result.message;
+                gameStatus.className = 'game-status correct';
+                
+                if (gameState.currentLevel === 3) {
+                    gameState.stopTimer();
+                    showCompletionScreen();
+                } else {
+                    nextLevelBtn.style.display = 'flex';
+                    checkBtn.style.display = 'none';
+                }
+                
+                updateLevelIndicator();
+            }
+        }
+
+        // 进入下一关
+        function goToNextLevel() {
+            const hasNextLevel = gameState.nextLevel();
+            
+            if (hasNextLevel) {
+                gameState.init(gameState.currentLevel + 1);
+                createGrid();
+                createCandidateWords();
+                
+                levelTitle.textContent = gameLevels[gameState.currentLevel].title;
+                gridTitle.textContent = "请从下方备选字中选择填入空格中";
+                
+                nextLevelBtn.style.display = 'none';
+                checkBtn.style.display = 'flex';
+                
+                gameStatus.textContent = '请选择空格或备选字';
+                gameStatus.className = 'game-status info';
+                
+                updateLevelIndicator();
+            } else {
+                gameState.stopTimer();
+                showCompletionScreen();
+            }
+        }
+
+        // 显示完成画面
+        function showCompletionScreen() {
+            gameStatus.textContent = `恭喜！你已成功解锁所有文化密码！总用时: ${gameState.formatTime(gameState.totalMilliseconds)}`;
+            gameStatus.className = 'game-status correct';
+            
+            completionTime.textContent = `游戏完成总用时: ${gameState.formatTime(gameState.totalMilliseconds)}`;
+            completionTime.style.display = 'block';
+            
+            nextLevelBtn.style.display = 'none';
+            checkBtn.style.display = 'none';
+            
+            resetBtn.textContent = '重新挑战';
+            
+            updateLevelIndicator();
+            
+            gameStatus.classList.add('celebrate');
+            
+            setTimeout(() => {
+                showNicknameModal();
+            }, 1500);
+        }
+
+        // 显示昵称输入弹窗
+        function showNicknameModal() {
+            nicknameInput.value = '';
+            
+            submitScoreBtn.disabled = false;
+            submitScoreBtn.textContent = '提交成绩';
+            
+            nicknameModal.style.display = 'flex';
+            nicknameInput.focus();
+        }
+
+        // 重置游戏
+        function resetGame() {
+            if (resetBtn.textContent === '重新挑战') {
+                if (confirm('确定要重新开始挑战吗？所有关卡进度和计时将被清除。')) {
+                    initializeGame();
+                }
+            } else {
+                if (confirm('确定要重置当前关卡吗？所有已填写的答案将被清除。')) {
+                    gameState.init(gameState.currentLevel);
+                    createGrid();
+                    createCandidateWords();
+                    
+                    gameStatus.textContent = '请选择空格或备选字';
+                    gameStatus.className = 'game-status info';
+                    
+                    nextLevelBtn.style.display = 'none';
+                    checkBtn.style.display = 'flex';
+                }
+            }
+        }
+
+        // 更新关卡指示器
+        function updateLevelIndicator() {
+            const dots = levelIndicator.querySelectorAll('.level-dot');
+            
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active', 'completed');
+                
+                if (index === gameState.currentLevel) {
+                    dot.classList.add('active');
+                }
+                
+                if (index < gameState.levelsCompleted) {
+                    dot.classList.add('completed');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
