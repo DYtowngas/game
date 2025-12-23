@@ -2110,9 +2110,26 @@
             
             gameStatus.classList.add('celebrate');
             
-            setTimeout(() => {
-                showNicknameModal();
-            }, 500);
+           // 替换原来的弹窗调用为以下代码：
+setTimeout(() => {
+    // 显示挑战结束提示
+    gameStatus.innerHTML = `
+        <div style="font-size: 1.1rem; margin-bottom: 8px;">
+            🎉 恭喜！你已成功解锁所有文化密码！
+        </div>
+        <div style="margin-bottom: 8px;">
+            本次挑战总用时: <strong>${gameState.formatTime(gameState.totalMilliseconds)}</strong>
+        </div>
+        <div style="background-color: #fff3cd; color: #856404; padding: 8px 12px; 
+                    border-radius: 6px; border-left: 4px solid #ffc107; 
+                    font-size: 0.95rem; margin-top: 10px;">
+            📢 <strong>挑战赛已结束</strong><br>
+            当前为展示模式，成绩不会更新至排行榜<br>
+            您可以继续挑战，巩固学习
+        </div>
+    `;
+    gameStatus.className = 'game-status correct';
+}, 500);
         }
 
         // 显示昵称输入弹窗
